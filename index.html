@@ -244,6 +244,42 @@ body.admin-on .admin-bar{display:flex;}
 }
 body.admin-on #fab-add{display:flex; align-items:center; justify-content:center;}
 
+/* ── Request box ─────────────────────── */
+#fab-request{
+  position:fixed; bottom:26px; right:26px; z-index:600;
+  background:linear-gradient(160deg,#2c1a0a,#18100A); color:#E8C84A;
+  border:1px solid rgba(232,200,74,.45); border-radius:50%;
+  width:56px; height:56px; font-size:24px; cursor:pointer;
+  box-shadow:0 6px 20px rgba(0,0,0,0.35);
+  display:flex; align-items:center; justify-content:center;
+}
+.request-section{max-width:900px; margin:44px auto 10px; padding:0 16px;}
+.request-card{
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(196,146,40,0.22) 0%, rgba(196,146,40,0) 55%),
+    linear-gradient(160deg,#1a0e04 0%,#2c1a0a 60%,#18100A 100%);
+  border-radius:18px; padding:32px 26px; text-align:center;
+  border-top:3px solid var(--gold); box-shadow:0 6px 24px rgba(0,0,0,0.18);
+}
+.request-card h2{color:var(--gold-light); font-size:24px; font-weight:900; margin-bottom:8px;}
+.request-card p{color:#d8c9a0; font-size:14px; line-height:1.7; max-width:520px; margin:0 auto 18px;}
+.request-card input, .request-card textarea{
+  width:100%; max-width:520px; display:block; margin:0 auto 10px;
+  padding:12px 14px; border-radius:12px; border:1px solid rgba(232,200,74,.25);
+  background:rgba(255,255,255,.07); color:#f7f5f1;
+  font-family:'Heebo',Arial,sans-serif; font-size:14px;
+}
+.request-card textarea{min-height:84px; resize:vertical;}
+.request-card input::placeholder, .request-card textarea::placeholder{color:#a08c5f;}
+.request-card .req-send{
+  margin-top:6px; background:#25D366; color:#08290f; border:none;
+  border-radius:999px; padding:13px 34px; font-size:16px; font-weight:900;
+  font-family:'Heebo',Arial,sans-serif; cursor:pointer;
+  box-shadow:0 6px 18px rgba(37,211,102,.3);
+}
+.request-card .req-send:active{transform:scale(.97);}
+.request-card .req-note{font-size:11px; color:#a08c5f; margin-top:12px;}
+
 /* ── Modal ───────────────────────────────── */
 #modal-overlay{
   display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000;
@@ -319,6 +355,18 @@ body.admin-on #fab-add{display:flex; align-items:center; justify-content:center;
 
 <div id="content"></div>
 
+<div class="request-section" id="request-box">
+  <div class="request-card">
+    <h2>💌 מבקשים מתכון?</h2>
+    <p>רוצים מתכון חיטוב, מסה, או גרסה בריאה למאכל שאתם מתים עליו? כתבו לי מה בא לכם — והמתכונים הכי מבוקשים ייכנסו לספר.</p>
+    <input type="text" id="req-name" placeholder="השם שלכם (לא חובה)">
+    <textarea id="req-text" placeholder="לדוגמה: הייתי רוצה גרסת חיטוב לפסטה קרבונרה…"></textarea>
+    <button class="req-send" onclick="sendRequest()">📲 שלחו לי בווטסאפ</button>
+    <div class="req-note">הכפתור פותח ווטסאפ עם הבקשה מוכנה — נשאר רק ללחוץ שליחה 💪</div>
+  </div>
+</div>
+
+<button id="fab-request" title="בקשת מתכון" onclick="document.getElementById('request-box').scrollIntoView({behavior:'smooth'})">💌</button>
 <button id="fab-add" title="הוסף מתכון">+</button>
 
 <div id="modal-overlay">
@@ -742,6 +790,18 @@ async function deleteRecipe(id){
   await saveRecipes();
   if(USER_IMAGES[id]){ delete USER_IMAGES[id]; await saveUserImages(); }
   render();
+}
+
+/* ── Recipe requests → WhatsApp ──────── */
+const REQUEST_WA = "972529574147";
+function sendRequest(){
+  const txtEl = document.getElementById('req-text');
+  const txt = txtEl.value.trim();
+  if(!txt){ txtEl.focus(); txtEl.placeholder = "כתבו כאן מה בא לכם 🙂"; return; }
+  const name = document.getElementById('req-name').value.trim();
+  let msg = "היי אביאל! 🙋 בקשת מתכון לספר:\n" + txt;
+  if(name) msg += "\n— " + name;
+  window.open("https://wa.me/" + REQUEST_WA + "?text=" + encodeURIComponent(msg), "_blank");
 }
 
 function toggleAdmin(){
